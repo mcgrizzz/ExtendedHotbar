@@ -21,20 +21,31 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ExtendedHotBar extends JavaPlugin implements Listener{
 	
 	boolean sneak = true;
+	boolean command = true;
+	ArrayList<Player> eh = new ArrayList<Player>();
 	
 	@Override
 	public void onEnable(){
 		getServer().getPluginManager().registerEvents(this, this);
-		
 		this.getConfig().addDefault("Sneak_on_survival", true);
+		this.getConfig().addDefault("Command_toggle", false);
 		sneak = this.getConfig().getBoolean("Sneak_on_survival");
+		command = this.getConfig().getBoolean("Command_toggle");
 		this.getConfig().options().copyDefaults(true);
 		saveConfig();
 	}
 	
 	@Override
 	public void onDisable(){
-		
+		eh = null;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String s, String[] args){
+		if(sender instanceof Player && sender.hasPermission("extendedhotbar.use")){
+			if(eh.contains((Player) sender)) eh.remove((Player) sender); else eh.add((Player) sender);
+			sender.sendMessage("Extended Hotbar "+(eh.contains((Player) sender) ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"));
+		}
 	}
 	
 	public void shiftInventory(Player p, int shift){
@@ -57,7 +68,7 @@ public class ExtendedHotBar extends JavaPlugin implements Listener{
 			}
 		}
 
-		if(!player.hasPermission("extendedhotbar.use"))return;
+		if(!player.hasPermission("extendedhotbar.use") && command && eh.contains(player))return;
 		if(event.getNewSlot() > 8)return;
 		
 		if((event.getPreviousSlot() == 0 || event.getPreviousSlot() == 1) && (event.getNewSlot() == 8 || event.getNewSlot() == 7)){
