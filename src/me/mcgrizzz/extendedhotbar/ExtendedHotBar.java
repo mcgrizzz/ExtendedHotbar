@@ -42,10 +42,11 @@ public class ExtendedHotBar extends JavaPlugin implements Listener{
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String s, String[] args){
-		if(sender instanceof Player && sender.hasPermission("extendedhotbar.use")){
+		if(sender instanceof Player && sender.hasPermission("extendedhotbar.use") & command){
 			if(eh.contains((Player) sender)) eh.remove((Player) sender); else eh.add((Player) sender);
 			sender.sendMessage("Extended Hotbar "+(eh.contains((Player) sender) ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"));
 		}
+		return true;
 	}
 	
 	public void shiftInventory(Player p, int shift){
