@@ -1,0 +1,8 @@
+name: ExtendedHotbar
+main: me.mcgrizzz.extendedhotbar.ExtendedHotBar
+version: 1.0.1
+description: >
+commands:
+  extendedhotbar:
+    description: Toggle scrollable hotbar
+    aliases: eh

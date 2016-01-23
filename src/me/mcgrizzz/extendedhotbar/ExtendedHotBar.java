@@ -1,11 +1,17 @@
 package me.mcgrizzz.extendedhotbar;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Skull;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,29 +28,30 @@ public class ExtendedHotBar extends JavaPlugin implements Listener{
 	
 	boolean sneak = true;
 	boolean command = true;
-	ArrayList<Player> eh = new ArrayList<Player>();
+	ArrayList<UUID> eh = new ArrayList<UUID>();
 	
 	@Override
 	public void onEnable(){
 		getServer().getPluginManager().registerEvents(this, this);
 		this.getConfig().addDefault("Sneak_on_survival", true);
-		this.getConfig().addDefault("Command_toggle", false);
 		sneak = this.getConfig().getBoolean("Sneak_on_survival");
-		command = this.getConfig().getBoolean("Command_toggle");
 		this.getConfig().options().copyDefaults(true);
 		saveConfig();
 	}
 	
 	@Override
 	public void onDisable(){
-		eh = null;
+		eh.clear();
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String s, String[] args){
-		if(sender instanceof Player && sender.hasPermission("extendedhotbar.use") & command){
-			if(eh.contains((Player) sender)) eh.remove((Player) sender); else eh.add((Player) sender);
-			sender.sendMessage("Extended Hotbar "+(eh.contains((Player) sender) ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"));
+		if(!cmd.getLabel().equalsIgnoreCase("extendedhotbar"))return true;
+		if(sender instanceof Player && sender.hasPermission("extendedhotbar.use")){
+			Player p = (Player)sender;
+			boolean t = (eh.contains(p.getUniqueId())) ? eh.remove(p.getUniqueId()) : !eh.add(p.getUniqueId());
+			p.sendMessage(ChatColor.GREEN + "ExtendedHotbar \n" + (t ? ChatColor.DARK_GREEN + " > Enabled <" : ChatColor.DARK_RED + " > Disabled < "));
+			return true;
 		}
 		return true;
 	}
@@ -69,7 +76,7 @@ public class ExtendedHotBar extends JavaPlugin implements Listener{
 			}
 		}
 
-		if(!player.hasPermission("extendedhotbar.use") && command && eh.contains(player))return;
+		if(!player.hasPermission("extendedhotbar.use") || eh.contains(player.getUniqueId()))return;
 		if(event.getNewSlot() > 8)return;
 		
 		if((event.getPreviousSlot() == 0 || event.getPreviousSlot() == 1) && (event.getNewSlot() == 8 || event.getNewSlot() == 7)){
